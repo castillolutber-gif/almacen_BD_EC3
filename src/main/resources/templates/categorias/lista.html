@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Categorías · Almacén</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+<body class="bg-light">
+<div th:replace="~{fragments/nav :: barra}"></div>
+<main class="container py-4 py-lg-5">
+    <div th:replace="~{fragments/alertas :: mensajes}"></div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <p class="text-primary fw-semibold mb-1">CATÁLOGOS</p>
+            <h1 class="h2 mb-0">Categorías</h1>
+        </div>
+        <a th:if="${esAdmin}" th:href="@{/categorias/nuevo}" class="btn btn-primary">Nueva categoría</a>
+    </div>
+
+    <!-- Barra de Búsqueda y Filtros -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-7">
+                    <label for="buscarCategoria" class="visually-hidden">Buscar</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white text-muted">🔍</span>
+                        <input type="text" id="buscarCategoria" class="form-control" placeholder="Buscar categoría por nombre o descripción...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label for="filtroEstado" class="visually-hidden">Estado</label>
+                    <select id="filtroEstado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="activa">Solo Activas</option>
+                        <option value="inactiva">Solo Inactivas</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" id="btnLimpiar" class="btn btn-outline-secondary w-100" title="Limpiar filtros">Borrar</button>
+                </div>
+            </div>
+            <div class="mt-2 text-secondary small d-flex justify-content-between align-items-center">
+                <span id="contadorResultados">Mostrando todas las categorías</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="tablaCategorias">
+                <thead class="table-light"><tr><th>Nombre</th><th>Descripción</th><th>Estado</th><th th:if="${esAdmin}" class="text-end">Acciones</th></tr></thead>
+                <tbody id="cuerpoTablaCategorias">
+                <tr th:each="categoria : ${categorias}"
+                    class="fila-categoria"
+                    th:attr="data-nombre=${#strings.toLowerCase(categoria.nombre)},
+                             data-descripcion=${#strings.toLowerCase(categoria.descripcion ?: '')},
+                             data-estado=${categoria.estado ? 'activa' : 'inactiva'}">
+                    <td class="fw-semibold" th:text="${categoria.nombre}">Abarrotes</td>
+                    <td th:text="${categoria.descripcion ?: '—'}">Descripción</td>
+                    <td><span class="badge" th:classappend="${categoria.estado} ? ' text-bg-success' : ' text-bg-secondary'"
+                              th:text="${categoria.estado} ? 'Activa' : 'Inactiva'">Activa</span></td>
+                    <td th:if="${esAdmin}" class="text-end">
+                        <a class="btn btn-sm btn-outline-primary" th:href="@{/categorias/{id}/editar(id=${categoria.id})}">Editar</a>
+                        <form class="d-inline" th:action="@{/categorias/{id}/estado(id=${categoria.id})}" method="post">
+                            <button class="btn btn-sm btn-outline-secondary" type="submit"
+                                    th:text="${categoria.estado} ? 'Desactivar' : 'Activar'">Desactivar</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr id="filaSinCoincidencias" class="d-none">
+                    <td colspan="4" class="text-center text-secondary py-5">
+                        No se encontraron categorías que coincidan con la búsqueda.
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(categorias)}"><td colspan="4" class="text-center text-secondary py-5">Aún no hay categorías.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const inputBuscar = document.getElementById('buscarCategoria');
+        const selectEstado = document.getElementById('filtroEstado');
+        const btnLimpiar = document.getElementById('btnLimpiar');
+        const filas = Array.from(document.querySelectorAll('#cuerpoTablaCategorias .fila-categoria'));
+        const filaSinCoincidencias = document.getElementById('filaSinCoincidencias');
+        const contador = document.getElementById('contadorResultados');
+        const total = filas.length;
+
+        function filtrar() {
+            const texto = inputBuscar.value.trim().toLowerCase();
+            const estado = selectEstado.value;
+
+            let visibles = 0;
+            filas.forEach(fila => {
+                const nombre = fila.dataset.nombre || '';
+                const descripcion = fila.dataset.descripcion || '';
+                const filaEstado = fila.dataset.estado || '';
+
+                const coincideTexto = !texto || nombre.includes(texto) || descripcion.includes(texto);
+                const coincideEstado = !estado || filaEstado === estado;
+
+                if (coincideTexto && coincideEstado) {
+                    fila.classList.remove('d-none');
+                    visibles++;
+                } else {
+                    fila.classList.add('d-none');
+                }
+            });
+
+            if (filaSinCoincidencias) {
+                if (visibles === 0 && total > 0) {
+                    filaSinCoincidencias.classList.remove('d-none');
+                } else {
+                    filaSinCoincidencias.classList.add('d-none');
+                }
+            }
+
+            if (contador) {
+                if (visibles === total) {
+                    contador.textContent = `Mostrando todas las categorías (${total})`;
+                } else {
+                    contador.textContent = `Mostrando ${visibles} de ${total} categorías`;
+                }
+            }
+        }
+
+        inputBuscar.addEventListener('input', filtrar);
+        selectEstado.addEventListener('change', filtrar);
+
+        btnLimpiar.addEventListener('click', function () {
+            inputBuscar.value = '';
+            selectEstado.value = '';
+            filtrar();
+        });
+
+        filtrar();
+    });
+</script>
+</body>
+</html>

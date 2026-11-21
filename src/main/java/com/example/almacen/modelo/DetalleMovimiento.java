@@ -56,4 +56,11 @@ public class DetalleMovimiento {
     public void setCantidad(Integer cantidad) { this.cantidad = cantidad; }
     public BigDecimal getCostoUnitario() { return costoUnitario; }
     public void setCostoUnitario(BigDecimal costoUnitario) { this.costoUnitario = costoUnitario; }
+
+    public BigDecimal getSubtotal() {
+        if (costoUnitario == null || cantidad == null) {
+            return BigDecimal.ZERO;
+        }
+        return costoUnitario.multiply(BigDecimal.valueOf(cantidad));
+    }
 }

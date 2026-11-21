@@ -38,13 +38,23 @@
             <div id="listaDetalles">
                 <div class="detalle-fila row g-2 align-items-end border rounded-3 p-3 mb-3"
                      th:each="detalle, iter : ${form.detalles}">
-                    <div class="col-lg-5"><label class="form-label">Producto</label>
+                    <div class="col-lg-5">
+                        <label class="form-label d-flex justify-content-between align-items-center mb-1">
+                            <span>Producto</span>
+                            <span class="text-secondary small fw-normal">Filtro rápido</span>
+                        </label>
+                        <div class="input-group input-group-sm mb-1">
+                            <span class="input-group-text bg-white text-muted">🔍</span>
+                            <input type="text" class="form-control buscador-producto" placeholder="Escribe para filtrar producto...">
+                        </div>
                         <select class="form-select producto-select" th:field="*{detalles[__${iter.index}__].productoId}" required>
                             <option value="">Selecciona un producto</option>
                             <option th:each="producto : ${productos}" th:value="${producto.id}"
-                                    th:attr="data-costo=${producto.precioCompra}"
+                                    th:attr="data-costo=${producto.precioCompra},
+                                             data-texto=${#strings.toLowerCase(producto.codigo + ' ' + producto.nombre)}"
                                     th:text="${producto.codigo + ' · ' + producto.nombre + ' (stock: ' + producto.stock + ')'}"></option>
-                        </select></div>
+                        </select>
+                    </div>
                     <div class="col-lg-2"><label class="form-label">Cantidad</label>
                         <input class="form-control cantidad-input" type="number" min="1" th:field="*{detalles[__${iter.index}__].cantidad}" required></div>
                     <div class="col-lg-3"><label class="form-label">Costo unitario (S/)</label>
@@ -60,29 +70,102 @@
 </main>
 <script>
     const listaDetalles = document.getElementById('listaDetalles');
+
+    function inicializarSelect(select) {
+        if (!select._allOptions) {
+            select._allOptions = Array.from(select.options).map(opt => ({
+                value: opt.value,
+                text: opt.text,
+                costo: opt.dataset.costo || '',
+                textoBusqueda: (opt.dataset.texto || opt.text).toLowerCase()
+            }));
+        }
+    }
+
+    function filtrarOpciones(select, busqueda) {
+        inicializarSelect(select);
+        const valorActual = select.value;
+        const query = busqueda.trim().toLowerCase();
+
+        select.innerHTML = '';
+        select._allOptions.forEach(item => {
+            if (!item.value) {
+                // Siempre incluir placeholder
+                const opt = document.createElement('option');
+                opt.value = item.value;
+                opt.text = item.text;
+                select.appendChild(opt);
+                return;
+            }
+
+            if (!query || item.textoBusqueda.includes(query) || item.value === valorActual) {
+                const opt = document.createElement('option');
+                opt.value = item.value;
+                opt.text = item.text;
+                if (item.costo) opt.dataset.costo = item.costo;
+                opt.dataset.texto = item.textoBusqueda;
+                if (item.value === valorActual) opt.selected = true;
+                select.appendChild(opt);
+            }
+        });
+    }
+
+    // Inicializar selects existentes
+    document.querySelectorAll('.producto-select').forEach(inicializarSelect);
+
+    // Evento de búsqueda de productos
+    listaDetalles.addEventListener('input', (evento) => {
+        if (!evento.target.classList.contains('buscador-producto')) return;
+        const fila = evento.target.closest('.detalle-fila');
+        const select = fila.querySelector('.producto-select');
+        filtrarOpciones(select, evento.target.value);
+    });
+
     document.getElementById('agregarDetalle').addEventListener('click', () => {
         const filas = listaDetalles.querySelectorAll('.detalle-fila');
         const nueva = filas[filas.length - 1].cloneNode(true);
         const indice = filas.length;
+
         nueva.querySelectorAll('select, input').forEach((campo) => {
-            campo.name = campo.name.replace(/detalles\[\d+\]/, `detalles[${indice}]`);
-            campo.id = campo.id.replace(/detalles\d+/, `detalles${indice}`);
-            campo.value = '';
+            if (campo.classList.contains('buscador-producto')) {
+                campo.value = '';
+            } else {
+                campo.name = campo.name.replace(/detalles\[\d+\]/, `detalles[${indice}]`);
+                campo.id = campo.id.replace(/detalles\d+/, `detalles${indice}`);
+                campo.value = '';
+            }
         });
+
+        const nuevoSelect = nueva.querySelector('.producto-select');
+        if (nuevoSelect) {
+            delete nuevoSelect._allOptions;
+            inicializarSelect(nuevoSelect);
+            filtrarOpciones(nuevoSelect, '');
+        }
+
         listaDetalles.appendChild(nueva);
     });
+
     listaDetalles.addEventListener('click', (evento) => {
         if (!evento.target.classList.contains('quitar-detalle')) return;
         const filas = listaDetalles.querySelectorAll('.detalle-fila');
-        if (filas.length > 1) evento.target.closest('.detalle-fila').remove();
-        else filas[0].querySelectorAll('select, input').forEach((campo) => campo.value = '');
+        if (filas.length > 1) {
+            evento.target.closest('.detalle-fila').remove();
+        } else {
+            filas[0].querySelectorAll('select, input').forEach((campo) => campo.value = '');
+            const select = filas[0].querySelector('.producto-select');
+            if (select) filtrarOpciones(select, '');
+        }
     });
+
     listaDetalles.addEventListener('change', (evento) => {
         if (!evento.target.classList.contains('producto-select')) return;
-        const costo = evento.target.selectedOptions[0]?.dataset.costo;
+        const optSeleccionada = evento.target.selectedOptions[0];
+        const costo = optSeleccionada?.dataset.costo;
         const campoCosto = evento.target.closest('.detalle-fila').querySelector('.costo-input');
         if (!campoCosto.value && costo) campoCosto.value = costo;
     });
+
     const tipo = document.getElementById('tipo');
     const proveedor = document.getElementById('contenedorProveedor');
     function actualizarProveedor() {

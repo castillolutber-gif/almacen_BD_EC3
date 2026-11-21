@@ -31,6 +31,7 @@ public class ProductoController {
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("productos", productoRepository.findAllByOrderByNombreAsc());
+        model.addAttribute("categorias", categoriaRepository.findAllByOrderByNombreAsc());
         return "productos/lista";
     }
 
