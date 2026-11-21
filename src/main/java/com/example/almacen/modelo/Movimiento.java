@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,5 +77,23 @@ public class Movimiento {
     public void agregarDetalle(DetalleMovimiento detalle) {
         detalles.add(detalle);
         detalle.setMovimiento(this);
+    }
+
+    public BigDecimal getTotal() {
+        if (detalles == null || detalles.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        return detalles.stream()
+                .map(DetalleMovimiento::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public int getTotalUnidades() {
+        if (detalles == null || detalles.isEmpty()) {
+            return 0;
+        }
+        return detalles.stream()
+                .mapToInt(d -> d.getCantidad() != null ? d.getCantidad() : 0)
+                .sum();
     }
 }
