@@ -1,22 +1,18 @@
 <!doctype html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/nav :: layout(~{::main}, 'categorias')}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Categorías · Almacén</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
-<body class="bg-light">
-<div th:replace="~{fragments/nav :: barra}"></div>
-<main class="container py-4 py-lg-5">
+<body>
+<main class="container-fluid px-lg-4 py-4 py-lg-5">
     <div th:replace="~{fragments/alertas :: mensajes}"></div>
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
             <p class="text-primary fw-semibold mb-1">CATÁLOGOS</p>
             <h1 class="h2 mb-0">Categorías</h1>
         </div>
-        <a th:if="${esAdmin}" th:href="@{/categorias/nuevo}" class="btn btn-primary">Nueva categoría</a>
+        <a th:if="${esAdmin}" th:href="@{/categorias/nuevo}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Nueva categoría</a>
     </div>
 
     <!-- Barra de Búsqueda y Filtros -->
@@ -26,7 +22,7 @@
                 <div class="col-md-7">
                     <label for="buscarCategoria" class="visually-hidden">Buscar</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-white text-muted">🔍</span>
+                        <span class="input-group-text bg-white text-muted"><i class="bi bi-search"></i></span>
                         <input type="text" id="buscarCategoria" class="form-control" placeholder="Buscar categoría por nombre o descripción...">
                     </div>
                 </div>
@@ -80,68 +76,67 @@
             </table>
         </div>
     </div>
-</main>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const inputBuscar = document.getElementById('buscarCategoria');
-        const selectEstado = document.getElementById('filtroEstado');
-        const btnLimpiar = document.getElementById('btnLimpiar');
-        const filas = Array.from(document.querySelectorAll('#cuerpoTablaCategorias .fila-categoria'));
-        const filaSinCoincidencias = document.getElementById('filaSinCoincidencias');
-        const contador = document.getElementById('contadorResultados');
-        const total = filas.length;
 
-        function filtrar() {
-            const texto = inputBuscar.value.trim().toLowerCase();
-            const estado = selectEstado.value;
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const inputBuscar = document.getElementById('buscarCategoria');
+            const selectEstado = document.getElementById('filtroEstado');
+            const btnLimpiar = document.getElementById('btnLimpiar');
+            const filas = Array.from(document.querySelectorAll('#cuerpoTablaCategorias .fila-categoria'));
+            const filaSinCoincidencias = document.getElementById('filaSinCoincidencias');
+            const contador = document.getElementById('contadorResultados');
+            const total = filas.length;
 
-            let visibles = 0;
-            filas.forEach(fila => {
-                const nombre = fila.dataset.nombre || '';
-                const descripcion = fila.dataset.descripcion || '';
-                const filaEstado = fila.dataset.estado || '';
+            function filtrar() {
+                const texto = inputBuscar.value.trim().toLowerCase();
+                const estado = selectEstado.value;
 
-                const coincideTexto = !texto || nombre.includes(texto) || descripcion.includes(texto);
-                const coincideEstado = !estado || filaEstado === estado;
+                let visibles = 0;
+                filas.forEach(fila => {
+                    const nombre = fila.dataset.nombre || '';
+                    const descripcion = fila.dataset.descripcion || '';
+                    const filaEstado = fila.dataset.estado || '';
 
-                if (coincideTexto && coincideEstado) {
-                    fila.classList.remove('d-none');
-                    visibles++;
-                } else {
-                    fila.classList.add('d-none');
+                    const coincideTexto = !texto || nombre.includes(texto) || descripcion.includes(texto);
+                    const coincideEstado = !estado || filaEstado === estado;
+
+                    if (coincideTexto && coincideEstado) {
+                        fila.classList.remove('d-none');
+                        visibles++;
+                    } else {
+                        fila.classList.add('d-none');
+                    }
+                });
+
+                if (filaSinCoincidencias) {
+                    if (visibles === 0 && total > 0) {
+                        filaSinCoincidencias.classList.remove('d-none');
+                    } else {
+                        filaSinCoincidencias.classList.add('d-none');
+                    }
                 }
+
+                if (contador) {
+                    if (visibles === total) {
+                        contador.textContent = `Mostrando todas las categorías (${total})`;
+                    } else {
+                        contador.textContent = `Mostrando ${visibles} de ${total} categorías`;
+                    }
+                }
+            }
+
+            inputBuscar.addEventListener('input', filtrar);
+            selectEstado.addEventListener('change', filtrar);
+
+            btnLimpiar.addEventListener('click', function () {
+                inputBuscar.value = '';
+                selectEstado.value = '';
+                filtrar();
             });
 
-            if (filaSinCoincidencias) {
-                if (visibles === 0 && total > 0) {
-                    filaSinCoincidencias.classList.remove('d-none');
-                } else {
-                    filaSinCoincidencias.classList.add('d-none');
-                }
-            }
-
-            if (contador) {
-                if (visibles === total) {
-                    contador.textContent = `Mostrando todas las categorías (${total})`;
-                } else {
-                    contador.textContent = `Mostrando ${visibles} de ${total} categorías`;
-                }
-            }
-        }
-
-        inputBuscar.addEventListener('input', filtrar);
-        selectEstado.addEventListener('change', filtrar);
-
-        btnLimpiar.addEventListener('click', function () {
-            inputBuscar.value = '';
-            selectEstado.value = '';
             filtrar();
         });
-
-        filtrar();
-    });
-</script>
+    </script>
+</main>
 </body>
 </html>

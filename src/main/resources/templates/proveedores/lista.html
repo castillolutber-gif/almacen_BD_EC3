@@ -1,19 +1,15 @@
 <!doctype html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/nav :: layout(~{::main}, 'proveedores')}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Proveedores · Almacén</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
-<body class="bg-light">
-<div th:replace="~{fragments/nav :: barra}"></div>
-<main class="container py-4 py-lg-5">
+<body>
+<main class="container-fluid px-lg-4 py-4 py-lg-5">
     <div th:replace="~{fragments/alertas :: mensajes}"></div>
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div><p class="text-primary fw-semibold mb-1">CATÁLOGOS</p><h1 class="h2 mb-0">Proveedores</h1></div>
-        <a th:if="${esAdmin}" th:href="@{/proveedores/nuevo}" class="btn btn-primary">Nuevo proveedor</a>
+        <a th:if="${esAdmin}" th:href="@{/proveedores/nuevo}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Nuevo proveedor</a>
     </div>
 
     <!-- Barra de Búsqueda -->
@@ -23,7 +19,7 @@
                 <div class="col-md-10">
                     <label for="buscarProveedor" class="visually-hidden">Buscar</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-white text-muted">🔍</span>
+                        <span class="input-group-text bg-white text-muted"><i class="bi bi-search"></i></span>
                         <input type="text" id="buscarProveedor" class="form-control" placeholder="Buscar proveedor por razón social, RUC, teléfono o correo...">
                     </div>
                 </div>
@@ -63,63 +59,63 @@
         </table>
     </div></div>
     <p class="form-text mt-3">Los proveedores se conservan para mantener el historial de movimientos.</p>
-</main>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const inputBuscar = document.getElementById('buscarProveedor');
-        const btnLimpiar = document.getElementById('btnLimpiar');
-        const filas = Array.from(document.querySelectorAll('#cuerpoTablaProveedores .fila-proveedor'));
-        const filaSinCoincidencias = document.getElementById('filaSinCoincidencias');
-        const contador = document.getElementById('contadorResultados');
-        const total = filas.length;
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const inputBuscar = document.getElementById('buscarProveedor');
+            const btnLimpiar = document.getElementById('btnLimpiar');
+            const filas = Array.from(document.querySelectorAll('#cuerpoTablaProveedores .fila-proveedor'));
+            const filaSinCoincidencias = document.getElementById('filaSinCoincidencias');
+            const contador = document.getElementById('contadorResultados');
+            const total = filas.length;
 
-        function filtrar() {
-            const texto = inputBuscar.value.trim().toLowerCase();
+            function filtrar() {
+                const texto = inputBuscar.value.trim().toLowerCase();
 
-            let visibles = 0;
-            filas.forEach(fila => {
-                const razon = fila.dataset.razonsocial || '';
-                const ruc = fila.dataset.ruc || '';
-                const tel = fila.dataset.telefono || '';
-                const correo = fila.dataset.correo || '';
+                let visibles = 0;
+                filas.forEach(fila => {
+                    const razon = fila.dataset.razonsocial || '';
+                    const ruc = fila.dataset.ruc || '';
+                    const tel = fila.dataset.telefono || '';
+                    const correo = fila.dataset.correo || '';
 
-                const coincideTexto = !texto || razon.includes(texto) || ruc.includes(texto) ||
-                    tel.includes(texto) || correo.includes(texto);
+                    const coincideTexto = !texto || razon.includes(texto) || ruc.includes(texto) ||
+                        tel.includes(texto) || correo.includes(texto);
 
-                if (coincideTexto) {
-                    fila.classList.remove('d-none');
-                    visibles++;
-                } else {
-                    fila.classList.add('d-none');
+                    if (coincideTexto) {
+                        fila.classList.remove('d-none');
+                        visibles++;
+                    } else {
+                        fila.classList.add('d-none');
+                    }
+                });
+
+                if (filaSinCoincidencias) {
+                    if (visibles === 0 && total > 0) {
+                        filaSinCoincidencias.classList.remove('d-none');
+                    } else {
+                        filaSinCoincidencias.classList.add('d-none');
+                    }
                 }
+
+                if (contador) {
+                    if (visibles === total) {
+                        contador.textContent = `Mostrando todos los proveedores (${total})`;
+                    } else {
+                        contador.textContent = `Mostrando ${visibles} de ${total} proveedores`;
+                    }
+                }
+            }
+
+            inputBuscar.addEventListener('input', filtrar);
+            btnLimpiar.addEventListener('click', function () {
+                inputBuscar.value = '';
+                filtrar();
             });
 
-            if (filaSinCoincidencias) {
-                if (visibles === 0 && total > 0) {
-                    filaSinCoincidencias.classList.remove('d-none');
-                } else {
-                    filaSinCoincidencias.classList.add('d-none');
-                }
-            }
-
-            if (contador) {
-                if (visibles === total) {
-                    contador.textContent = `Mostrando todos los proveedores (${total})`;
-                } else {
-                    contador.textContent = `Mostrando ${visibles} de ${total} proveedores`;
-                }
-            }
-        }
-
-        inputBuscar.addEventListener('input', filtrar);
-        btnLimpiar.addEventListener('click', function () {
-            inputBuscar.value = '';
             filtrar();
         });
-
-        filtrar();
-    });
-</script>
+    </script>
+</main>
 </body>
 </html>

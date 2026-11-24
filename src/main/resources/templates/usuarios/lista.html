@@ -1,19 +1,15 @@
 <!doctype html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/nav :: layout(~{::main}, 'usuarios')}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Usuarios · Almacén</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
-<body class="bg-light">
-<div th:replace="~{fragments/nav :: barra}"></div>
-<main class="container py-4 py-lg-5">
+<body>
+<main class="container-fluid px-lg-4 py-4 py-lg-5">
     <div th:replace="~{fragments/alertas :: mensajes}"></div>
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div><p class="text-primary fw-semibold mb-1">ADMINISTRACIÓN</p><h1 class="h2 mb-0">Usuarios</h1></div>
-        <a th:href="@{/usuarios/nuevo}" class="btn btn-primary">Nuevo usuario</a>
+        <a th:href="@{/usuarios/nuevo}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Nuevo usuario</a>
     </div>
 
     <!-- Barra de Búsqueda y Filtros -->
@@ -23,7 +19,7 @@
                 <div class="col-md-5">
                     <label for="buscarUsuario" class="visually-hidden">Buscar</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-white text-muted">🔍</span>
+                        <span class="input-group-text bg-white text-muted"><i class="bi bi-search"></i></span>
                         <input type="text" id="buscarUsuario" class="form-control" placeholder="Buscar usuario por nombre o correo...">
                     </div>
                 </div>
@@ -85,73 +81,73 @@
         </table>
     </div></div>
     <p class="form-text mt-3">Las contraseñas nunca se muestran; puedes establecer una nueva al editar una cuenta.</p>
-</main>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const inputBuscar = document.getElementById('buscarUsuario');
-        const selectRol = document.getElementById('filtroRol');
-        const selectEstado = document.getElementById('filtroEstado');
-        const btnLimpiar = document.getElementById('btnLimpiar');
-        const filas = Array.from(document.querySelectorAll('#cuerpoTablaUsuarios .fila-usuario'));
-        const filaSinCoincidencias = document.getElementById('filaSinCoincidencias');
-        const contador = document.getElementById('contadorResultados');
-        const total = filas.length;
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const inputBuscar = document.getElementById('buscarUsuario');
+            const selectRol = document.getElementById('filtroRol');
+            const selectEstado = document.getElementById('filtroEstado');
+            const btnLimpiar = document.getElementById('btnLimpiar');
+            const filas = Array.from(document.querySelectorAll('#cuerpoTablaUsuarios .fila-usuario'));
+            const filaSinCoincidencias = document.getElementById('filaSinCoincidencias');
+            const contador = document.getElementById('contadorResultados');
+            const total = filas.length;
 
-        function filtrar() {
-            const texto = inputBuscar.value.trim().toLowerCase();
-            const rol = selectRol.value;
-            const estado = selectEstado.value;
+            function filtrar() {
+                const texto = inputBuscar.value.trim().toLowerCase();
+                const rol = selectRol.value;
+                const estado = selectEstado.value;
 
-            let visibles = 0;
-            filas.forEach(fila => {
-                const nombre = fila.dataset.nombre || '';
-                const correo = fila.dataset.correo || '';
-                const filaRol = fila.dataset.rol || '';
-                const filaEstado = fila.dataset.estado || '';
+                let visibles = 0;
+                filas.forEach(fila => {
+                    const nombre = fila.dataset.nombre || '';
+                    const correo = fila.dataset.correo || '';
+                    const filaRol = fila.dataset.rol || '';
+                    const filaEstado = fila.dataset.estado || '';
 
-                const coincideTexto = !texto || nombre.includes(texto) || correo.includes(texto);
-                const coincideRol = !rol || filaRol === rol;
-                const coincideEstado = !estado || filaEstado === estado;
+                    const coincideTexto = !texto || nombre.includes(texto) || correo.includes(texto);
+                    const coincideRol = !rol || filaRol === rol;
+                    const coincideEstado = !estado || filaEstado === estado;
 
-                if (coincideTexto && coincideRol && coincideEstado) {
-                    fila.classList.remove('d-none');
-                    visibles++;
-                } else {
-                    fila.classList.add('d-none');
+                    if (coincideTexto && coincideRol && coincideEstado) {
+                        fila.classList.remove('d-none');
+                        visibles++;
+                    } else {
+                        fila.classList.add('d-none');
+                    }
+                });
+
+                if (filaSinCoincidencias) {
+                    if (visibles === 0 && total > 0) {
+                        filaSinCoincidencias.classList.remove('d-none');
+                    } else {
+                        filaSinCoincidencias.classList.add('d-none');
+                    }
                 }
+
+                if (contador) {
+                    if (visibles === total) {
+                        contador.textContent = `Mostrando todos los usuarios (${total})`;
+                    } else {
+                        contador.textContent = `Mostrando ${visibles} de ${total} usuarios`;
+                    }
+                }
+            }
+
+            inputBuscar.addEventListener('input', filtrar);
+            selectRol.addEventListener('change', filtrar);
+            selectEstado.addEventListener('change', filtrar);
+
+            btnLimpiar.addEventListener('click', function () {
+                inputBuscar.value = '';
+                selectRol.value = '';
+                selectEstado.value = '';
+                filtrar();
             });
 
-            if (filaSinCoincidencias) {
-                if (visibles === 0 && total > 0) {
-                    filaSinCoincidencias.classList.remove('d-none');
-                } else {
-                    filaSinCoincidencias.classList.add('d-none');
-                }
-            }
-
-            if (contador) {
-                if (visibles === total) {
-                    contador.textContent = `Mostrando todos los usuarios (${total})`;
-                } else {
-                    contador.textContent = `Mostrando ${visibles} de ${total} usuarios`;
-                }
-            }
-        }
-
-        inputBuscar.addEventListener('input', filtrar);
-        selectRol.addEventListener('change', filtrar);
-        selectEstado.addEventListener('change', filtrar);
-
-        btnLimpiar.addEventListener('click', function () {
-            inputBuscar.value = '';
-            selectRol.value = '';
-            selectEstado.value = '';
             filtrar();
         });
-
-        filtrar();
-    });
-</script>
+    </script>
+</main>
 </body>
 </html>
