@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/nav :: layout(~{::main}, 'perfil')}">
+<head>
+    <title>Mi Perfil · Almacén</title>
+</head>
+<body>
+<main class="container py-4 py-lg-5">
+    <div th:replace="~{fragments/alertas :: mensajes}"></div>
+
+    <div class="mb-4 pb-2 border-bottom border-dark">
+        <p class="text-uppercase fw-bold text-success mb-1" style="font-size: 0.75rem; letter-spacing: 0.1rem;">Cuenta de Usuario</p>
+        <h1 class="display-6 fw-bold text-white mb-0">Mi Perfil</h1>
+    </div>
+
+    <div class="row g-4">
+        <!-- Tarjeta Informativa del Usuario -->
+        <div class="col-lg-5">
+            <div class="card p-4 shadow-sm h-100">
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-dark border border-secondary mb-3" style="width: 90px; height: 90px;">
+                        <i class="bi bi-person-fill text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="text-white fw-bold mb-1" th:text="${usuario.nombre}">Nombre de Usuario</h4>
+                    <p class="text-secondary small mb-2" th:text="${usuario.correo}">correo@ejemplo.com</p>
+                    <span th:if="${usuario.rol.name() == 'ADMIN'}" class="badge text-bg-success px-3 py-1">ADMINISTRADOR</span>
+                    <span th:unless="${usuario.rol.name() == 'ADMIN'}" class="badge text-bg-secondary px-3 py-1">EMPLEADO</span>
+                </div>
+
+                <div class="border-top border-secondary pt-3 mt-auto">
+                    <div class="d-flex justify-content-between small text-secondary py-1">
+                        <span>Estado:</span>
+                        <span class="text-success fw-semibold" th:if="${usuario.estado}">Activo</span>
+                        <span class="text-danger fw-semibold" th:unless="${usuario.estado}">Inactivo</span>
+                    </div>
+                    <div class="d-flex justify-content-between small text-secondary py-1">
+                        <span>Rol en almacén:</span>
+                        <span class="text-white" th:text="${usuario.rol}">EMPLEADO</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de Cambio de Contraseña -->
+        <div class="col-lg-7">
+            <div class="card p-4 p-md-4 shadow-sm">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-shield-lock-fill text-success fs-4"></i>
+                    <h4 class="text-white fw-bold mb-0">Modificar contraseña</h4>
+                </div>
+                <p class="text-secondary small mb-4">
+                    Para tu seguridad, ingresa tu contraseña actual antes de registrar la nueva.
+                </p>
+
+                <form th:action="@{/perfil/password}" th:object="${form}" method="post">
+                    <div class="mb-3">
+                        <label for="passwordActual" class="form-label small text-secondary fw-semibold">Contraseña actual</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-key"></i></span>
+                            <input id="passwordActual" th:field="*{passwordActual}" type="password" class="form-control"
+                                   placeholder="Ingresa tu contraseña actual" required>
+                        </div>
+                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('passwordActual')}" th:errors="*{passwordActual}"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nuevoPassword" class="form-label small text-secondary fw-semibold">Nueva contraseña</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input id="nuevoPassword" th:field="*{nuevoPassword}" type="password" class="form-control"
+                                   placeholder="Mínimo 6 caracteres" required>
+                        </div>
+                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('nuevoPassword')}" th:errors="*{nuevoPassword}"></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="confirmarNuevoPassword" class="form-label small text-secondary fw-semibold">Confirmar nueva contraseña</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-shield-check"></i></span>
+                            <input id="confirmarNuevoPassword" th:field="*{confirmarNuevoPassword}" type="password" class="form-control"
+                                   placeholder="Repite la nueva contraseña" required>
+                        </div>
+                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('confirmarNuevoPassword')}" th:errors="*{confirmarNuevoPassword}"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 fs-6">
+                        <i class="bi bi-check2-circle me-1"></i>Actualizar mi contraseña
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

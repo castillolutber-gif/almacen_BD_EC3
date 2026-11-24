@@ -1,0 +1,336 @@
+/* ==========================================================================
+   Tema Spotify Dark para Sistema de Almacén
+   ========================================================================== */
+
+:root {
+    --sp-bg-base: #121212;
+    --sp-bg-black: #000000;
+    --sp-bg-card: #181818;
+    --sp-bg-card-hover: #282828;
+    --sp-bg-surface: #242424;
+    --sp-border: #2a2a2a;
+    --sp-border-subtle: #333333;
+
+    --sp-green: #1db954;
+    --sp-green-hover: #1ed760;
+    --sp-green-active: #169c46;
+    --sp-green-subtle: rgba(29, 185, 84, 0.15);
+
+    --sp-text-base: #ffffff;
+    --sp-text-subdued: #b3b3b3;
+    --sp-text-muted: #727272;
+
+    --sidebar-width: 250px;
+}
+
+/* Reset y cuerpo general */
+body {
+    background-color: var(--sp-bg-black);
+    color: var(--sp-text-base);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Barra Lateral estilo Spotify */
+.app-sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1030;
+    background-color: var(--sp-bg-black);
+    color: var(--sp-text-base);
+    transition: all 0.25s ease;
+    overflow-y: auto;
+    border-right: 1px solid var(--sp-border);
+}
+
+.sidebar-brand {
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.03rem;
+    color: var(--sp-text-base);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.sidebar-brand i {
+    color: var(--sp-green);
+    font-size: 1.6rem;
+}
+.sidebar-brand:hover {
+    color: var(--sp-green-hover);
+}
+
+.sidebar-nav {
+    padding: 0.5rem 0.75rem;
+}
+
+.nav-category {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.08rem;
+    color: var(--sp-text-muted);
+    padding: 1.25rem 0.75rem 0.4rem;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.7rem 0.85rem;
+    color: var(--sp-text-subdued);
+    text-decoration: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+    transition: all 0.2s ease;
+}
+.sidebar-link i {
+    font-size: 1.3rem;
+    transition: transform 0.2s ease;
+}
+.sidebar-link:hover {
+    color: var(--sp-text-base);
+    background-color: var(--sp-bg-card-hover);
+}
+.sidebar-link:hover i {
+    color: var(--sp-green);
+    transform: scale(1.05);
+}
+.sidebar-link.active {
+    color: var(--sp-text-base);
+    background-color: var(--sp-bg-surface);
+}
+.sidebar-link.active i {
+    color: var(--sp-green);
+}
+
+.sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--sp-border);
+    background-color: rgba(18, 18, 18, 0.75);
+}
+
+/* Área Principal con contenedor curvado estilo interfaz Spotify */
+.app-main {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    background-color: var(--sp-bg-black);
+    padding: 0.75rem 0.75rem 0.75rem 0;
+    transition: all 0.25s ease;
+}
+
+.main-content-wrapper {
+    background: linear-gradient(180deg, #1f2722 0%, var(--sp-bg-base) 280px);
+    border-radius: 0.65rem;
+    min-height: calc(100vh - 1.5rem);
+    padding: 2rem 2.25rem;
+    border: 1px solid var(--sp-border);
+}
+
+/* Tarjetas métricas y contenedoras */
+.card {
+    background-color: var(--sp-bg-card) !important;
+    border: 1px solid var(--sp-border) !important;
+    border-radius: 0.75rem;
+    color: var(--sp-text-base);
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.card:hover {
+    border-color: var(--sp-border-subtle) !important;
+}
+
+.card-header {
+    background-color: transparent !important;
+    border-bottom: 1px solid var(--sp-border) !important;
+    color: var(--sp-text-base);
+}
+
+/* Botones estilo Spotify */
+.btn-primary {
+    background-color: var(--sp-green) !important;
+    border-color: var(--sp-green) !important;
+    color: #000000 !important;
+    font-weight: 700;
+    border-radius: 500px; /* Redondeado tipo cápsula Spotify */
+    padding: 0.55rem 1.4rem;
+    letter-spacing: 0.02rem;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+}
+.btn-primary:hover {
+    background-color: var(--sp-green-hover) !important;
+    border-color: var(--sp-green-hover) !important;
+    transform: scale(1.03);
+    color: #000000 !important;
+}
+.btn-primary:active {
+    background-color: var(--sp-green-active) !important;
+    transform: scale(0.98);
+}
+
+.btn-outline-primary {
+    color: var(--sp-green) !important;
+    border-color: var(--sp-green) !important;
+    border-radius: 500px;
+    font-weight: 600;
+}
+.btn-outline-primary:hover {
+    background-color: var(--sp-green) !important;
+    color: #000000 !important;
+}
+
+.btn-outline-secondary {
+    color: var(--sp-text-subdued) !important;
+    border-color: var(--sp-border-subtle) !important;
+    background-color: transparent;
+    border-radius: 500px;
+    font-weight: 600;
+}
+.btn-outline-secondary:hover {
+    color: var(--sp-text-base) !important;
+    background-color: var(--sp-bg-card-hover) !important;
+    border-color: var(--sp-text-subdued) !important;
+}
+
+.btn-outline-danger {
+    color: #f15e6c !important;
+    border-color: rgba(241, 94, 108, 0.4) !important;
+    border-radius: 500px;
+}
+.btn-outline-danger:hover {
+    background-color: #f15e6c !important;
+    color: #ffffff !important;
+}
+
+/* Tablas estilo lista de canciones Spotify */
+.table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--sp-text-subdued);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.06);
+    --bs-table-hover-color: var(--sp-text-base);
+    border-color: var(--sp-border);
+}
+
+.table thead th {
+    background-color: transparent;
+    color: var(--sp-text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08rem;
+    font-weight: 700;
+    border-bottom: 1px solid var(--sp-border);
+    padding: 0.85rem 1rem;
+}
+
+.table tbody tr {
+    transition: background-color 0.15s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.table tbody td {
+    padding: 0.95rem 1rem;
+    color: var(--sp-text-subdued);
+}
+.table tbody tr:hover td {
+    color: var(--sp-text-base);
+}
+
+/* Inputs, selects y controles */
+.form-control, .form-select {
+    background-color: var(--sp-bg-surface);
+    border: 1px solid transparent;
+    color: var(--sp-text-base);
+    border-radius: 0.5rem;
+    padding: 0.55rem 0.85rem;
+}
+.form-control:focus, .form-select:focus {
+    background-color: var(--sp-bg-surface);
+    border-color: var(--sp-green);
+    color: var(--sp-text-base);
+    box-shadow: 0 0 0 2px var(--sp-green-subtle);
+}
+.form-control::placeholder {
+    color: var(--sp-text-muted);
+}
+.input-group-text {
+    background-color: var(--sp-bg-surface);
+    border: 1px solid transparent;
+    color: var(--sp-text-subdued);
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+}
+.form-select option {
+    background-color: var(--sp-bg-card);
+    color: var(--sp-text-base);
+}
+
+/* Badges */
+.badge.text-bg-success {
+    background-color: var(--sp-green) !important;
+    color: #000000 !important;
+    font-weight: 700;
+}
+.badge.text-bg-warning {
+    background-color: #f59b23 !important;
+    color: #000000 !important;
+    font-weight: 700;
+}
+.badge.text-bg-secondary {
+    background-color: var(--sp-surface) !important;
+    color: var(--sp-text-subdued) !important;
+    border: 1px solid var(--sp-border);
+}
+.badge.text-bg-primary {
+    background-color: rgba(29, 185, 84, 0.2) !important;
+    color: var(--sp-green-hover) !important;
+    border: 1px solid rgba(29, 185, 84, 0.4);
+}
+
+/* Modales */
+.modal-content {
+    background-color: var(--sp-bg-card) !important;
+    color: var(--sp-text-base) !important;
+    border: 1px solid var(--sp-border) !important;
+    border-radius: 0.85rem;
+}
+.modal-header, .modal-footer {
+    border-color: var(--sp-border) !important;
+    background-color: transparent !important;
+}
+.btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Textos secundarios */
+.text-secondary {
+    color: var(--sp-text-subdued) !important;
+}
+.text-muted {
+    color: var(--sp-text-muted) !important;
+}
+.form-text {
+    color: var(--sp-text-muted);
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+    .app-sidebar {
+        margin-left: calc(-1 * var(--sidebar-width));
+    }
+    .app-sidebar.show {
+        margin-left: 0;
+    }
+    .app-main {
+        margin-left: 0;
+        padding: 0.5rem;
+    }
+    .main-content-wrapper {
+        padding: 1.25rem 1rem;
+    }
+}
